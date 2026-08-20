@@ -339,7 +339,7 @@ button#submit-btn:disabled {
 
 .grid .card {
   min-width: 0;
-  max-height: 150px;
+  max-height: 240px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
