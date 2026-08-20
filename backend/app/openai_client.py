@@ -48,6 +48,11 @@ matching exactly this shape:
   "red_flags": ["<any credibility concerns, e.g. no named sources, contradicts known facts, fabricated quotes>"],
   "ai_score": <float 0-100>
 }
+
+Your entire response must be that JSON object and nothing else — no preamble, no \
+explanation, no markdown code fences, even if the text is short, ambiguous, or you are \
+uncertain. If you cannot verify a claim, still return the JSON with "verdict": "unverified" \
+rather than declining to answer.
 """
 
 
@@ -62,6 +67,9 @@ def _build_user_prompt(text: str, url: str | None, source_name: str | None) -> s
 
 def _extract_json(raw: str) -> dict:
     raw = raw.strip()
+    if not raw:
+        raise ValueError("Model returned an empty response (no text output).")
+
     fence_match = re.search(r"```(?:json)?\s*(\{.*\})\s*```", raw, re.DOTALL)
     if fence_match:
         raw = fence_match.group(1)
@@ -69,7 +77,15 @@ def _extract_json(raw: str) -> dict:
         brace_match = re.search(r"\{.*\}", raw, re.DOTALL)
         if brace_match:
             raw = brace_match.group(0)
-    return json.loads(raw)
+        else:
+            preview = raw[:300] + ("…" if len(raw) > 300 else "")
+            raise ValueError(f"No JSON object found in model output. Raw response: {preview!r}")
+
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as exc:
+        preview = raw[:300] + ("…" if len(raw) > 300 else "")
+        raise ValueError(f"Model output was not valid JSON ({exc}). Raw response: {preview!r}") from exc
 
 
 def run_fact_check(text: str, url: str | None, source_name: str | None) -> AIFactCheck:
@@ -96,6 +112,24 @@ def run_fact_check(text: str, url: str | None, source_name: str | None) -> AIFac
             for item in getattr(response, "output", [])
         )
         raw_text = response.output_text
+        status = getattr(response, "status", None)
+        incomplete_details = getattr(response, "incomplete_details", None)
+        logger.info(
+            "AI fact-check response: status=%s incomplete_details=%s output_text_len=%d used_web_search=%s",
+            status, incomplete_details, len(raw_text or ""), used_web_search,
+        )
+        if raw_text:
+            logger.debug("AI fact-check raw output_text: %r", raw_text)
+
+        if not (raw_text or "").strip() and status != "completed":
+            reason = getattr(incomplete_details, "reason", None) if incomplete_details else None
+            raise ValueError(
+                f"OpenAI response did not complete (status={status!r}"
+                + (f", reason={reason!r}" if reason else "")
+                + "). This usually means the request hit a token/time limit before producing output — "
+                "try a shorter input or disable web search."
+            )
+
         data = _extract_json(raw_text)
         data["used_web_search"] = used_web_search
         return AIFactCheck(**data)

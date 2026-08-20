@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -6,6 +7,8 @@ from fastapi.staticfiles import StaticFiles
 
 from .schemas import AnalyzeRequest, AnalyzeResponse
 from .scoring import analyze
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 
 app = FastAPI(title="Fake News Detection Agent", version="1.0.0")
 
