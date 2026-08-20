@@ -339,19 +339,6 @@ button#submit-btn:disabled {
 
 .grid .card {
   min-width: 0;
-  max-height: 240px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) transparent;
-}
-
-.grid .card::-webkit-scrollbar {
-  width: 6px;
-}
-
-.grid .card::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 3px;
 }
 
 .grid h3 {
@@ -543,10 +530,6 @@ button#submit-btn:disabled {
 
   .grid {
     grid-template-columns: 1fr;
-  }
-
-  .grid .card {
-    max-height: none;
   }
 
   .details-card {
