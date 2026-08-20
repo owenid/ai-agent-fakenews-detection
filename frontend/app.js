@@ -13,11 +13,10 @@ function applyTheme(theme) {
   } else {
     document.documentElement.removeAttribute("data-theme");
   }
+  const label = theme === "light" ? "Switch to dark mode" : "Switch to light mode";
   themeToggle.setAttribute("aria-pressed", String(theme === "light"));
-  themeToggle.setAttribute(
-    "aria-label",
-    theme === "light" ? "Switch to dark mode" : "Switch to light mode"
-  );
+  themeToggle.setAttribute("aria-label", label);
+  themeToggle.setAttribute("title", label);
 }
 
 themeToggle.addEventListener("click", () => {
