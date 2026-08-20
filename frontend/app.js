@@ -28,6 +28,29 @@ themeToggle.addEventListener("click", () => {
 
 applyTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
 
+const MARKDOWN_LINK_RE = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+function renderTextWithLinks(container, text) {
+  container.textContent = "";
+  let lastIndex = 0;
+  for (const match of text.matchAll(MARKDOWN_LINK_RE)) {
+    const [full, label, url] = match;
+    if (match.index > lastIndex) {
+      container.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+    }
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = label;
+    container.appendChild(a);
+    lastIndex = match.index + full.length;
+  }
+  if (lastIndex < text.length) {
+    container.appendChild(document.createTextNode(text.slice(lastIndex)));
+  }
+}
+
 function verdictColor(verdict) {
   if (verdict === "likely_credible") return "#3fbf7f";
   if (verdict === "mixed_or_uncertain") return "#e0b83f";
@@ -72,8 +95,10 @@ function renderResult(data) {
 
   const bd = data.breakdown;
 
-  document.getElementById("ai-summary").textContent =
-    bd.ai_fact_check.error || bd.ai_fact_check.summary || "";
+  renderTextWithLinks(
+    document.getElementById("ai-summary"),
+    bd.ai_fact_check.error || bd.ai_fact_check.summary || ""
+  );
 
   document.getElementById("source-score").textContent =
     Math.round(bd.source_reputation.score) + " / 100";
@@ -99,7 +124,7 @@ function renderResult(data) {
 
   renderList(document.getElementById("red-flags"), bd.ai_fact_check.red_flags, (flag) => {
     const li = document.createElement("li");
-    li.textContent = flag;
+    renderTextWithLinks(li, flag);
     return li;
   });
 
@@ -112,7 +137,7 @@ function renderResult(data) {
     text.textContent = claim.claim;
     const explanation = document.createElement("div");
     explanation.className = "claim-explanation";
-    explanation.textContent = claim.explanation;
+    renderTextWithLinks(explanation, claim.explanation);
     li.appendChild(span);
     li.appendChild(text);
     li.appendChild(explanation);
