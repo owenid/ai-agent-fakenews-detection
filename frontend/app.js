@@ -2,6 +2,7 @@ const form = document.getElementById("analyze-form");
 const submitBtn = document.getElementById("submit-btn");
 const resultSection = document.getElementById("result");
 const errorBox = document.getElementById("error-box");
+const emptyState = document.getElementById("empty-state");
 
 const GAUGE_CIRCUMFERENCE = 326.7;
 
@@ -32,6 +33,7 @@ function renderList(el, items, renderItem) {
 
 function renderResult(data) {
   errorBox.classList.add("hidden");
+  emptyState.classList.add("hidden");
   resultSection.classList.remove("hidden");
 
   const score = data.composite_score;
@@ -119,6 +121,7 @@ function renderResult(data) {
 
 function renderError(message) {
   resultSection.classList.add("hidden");
+  emptyState.classList.add("hidden");
   errorBox.classList.remove("hidden");
   errorBox.textContent = message;
 }
