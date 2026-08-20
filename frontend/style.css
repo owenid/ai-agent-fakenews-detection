@@ -86,8 +86,7 @@ label {
 }
 
 .form-panel #text {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 140px;
 }
 
 textarea,
@@ -110,17 +109,9 @@ input:focus {
   border-color: var(--accent);
 }
 
-.row {
-  flex: 0 0 auto;
-  display: flex;
-  gap: 12px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
 .field {
-  flex: 1 1 150px;
-  min-width: 0;
+  flex: 0 0 auto;
+  margin-top: 10px;
 }
 
 button#submit-btn {
