@@ -3,8 +3,31 @@ const submitBtn = document.getElementById("submit-btn");
 const resultSection = document.getElementById("result");
 const errorBox = document.getElementById("error-box");
 const emptyState = document.getElementById("empty-state");
+const themeToggle = document.getElementById("theme-toggle");
 
 const GAUGE_CIRCUMFERENCE = 326.7;
+
+function applyTheme(theme) {
+  if (theme === "light") {
+    document.documentElement.setAttribute("data-theme", "light");
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+  themeToggle.setAttribute("aria-pressed", String(theme === "light"));
+  themeToggle.setAttribute(
+    "aria-label",
+    theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+  );
+}
+
+themeToggle.addEventListener("click", () => {
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  const next = isLight ? "dark" : "light";
+  localStorage.setItem("theme", next);
+  applyTheme(next);
+});
+
+applyTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
 
 function verdictColor(verdict) {
   if (verdict === "likely_credible") return "#3fbf7f";
