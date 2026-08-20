@@ -49,7 +49,7 @@ function renderResult(data) {
   const bd = data.breakdown;
 
   document.getElementById("ai-summary").textContent =
-    bd.ai_fact_check.summary || bd.ai_fact_check.error || "";
+    bd.ai_fact_check.error || bd.ai_fact_check.summary || "";
 
   document.getElementById("source-score").textContent =
     Math.round(bd.source_reputation.score) + " / 100";

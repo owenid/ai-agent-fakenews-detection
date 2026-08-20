@@ -1,10 +1,13 @@
 import json
+import logging
 import re
 
 from openai import OpenAI
 
 from . import config
 from .schemas import AIFactCheck
+
+logger = logging.getLogger(__name__)
 
 _client: OpenAI | None = None
 
@@ -97,8 +100,9 @@ def run_fact_check(text: str, url: str | None, source_name: str | None) -> AIFac
         data["used_web_search"] = used_web_search
         return AIFactCheck(**data)
     except Exception as exc:  # noqa: BLE001 - surface any failure as a soft error
+        logger.exception("AI fact-check request failed")
         return AIFactCheck(
             error=f"AI fact-check failed: {exc}",
-            summary="AI fact-check could not be completed due to an error.",
+            summary=f"AI fact-check could not be completed: {exc}",
             used_web_search=used_web_search,
         )
