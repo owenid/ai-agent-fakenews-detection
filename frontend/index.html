@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fake News Detection Agent</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    (function () {
+      var saved = localStorage.getItem("theme");
+      if (saved === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="header-top">
+        <h1>Fake News Detection Agent</h1>
+        <button type="button" id="theme-toggle" class="theme-toggle" title="Switch to light mode" aria-label="Switch to light mode" aria-pressed="false">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+          </svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+        </button>
+      </div>
+      <p class="subtitle">
+        Score an article, claim, or post using source reputation, language/style heuristics, and an
+        AI fact-check that searches the web for credible corroborating or contradicting sources.
+      </p>
+    </header>
+
+    <main>
+      <form id="analyze-form" class="card form-panel">
+        <label for="text">Text to analyze <span class="required">*</span></label>
+        <textarea id="text" name="text" placeholder="Paste the article text or claim here..." required></textarea>
+
+        <div class="field">
+          <label for="url">Source URL <span class="required">*</span></label>
+          <input type="url" id="url" name="url" placeholder="https://example.com/article" required />
+        </div>
+        <div class="field">
+          <label for="source_name">Source / publisher name (optional)</label>
+          <input type="text" id="source_name" name="source_name" placeholder="e.g. Example News Network" />
+        </div>
+
+        <button type="submit" id="submit-btn">Analyze</button>
+
+        <p class="disclaimer">
+          Combines source reputation, language/style heuristics, and an OpenAI-powered web-searching
+          fact-checker. Always use your own judgment and consult primary sources.
+        </p>
+      </form>
+
+      <section class="result-panel">
+        <div id="empty-state" class="empty-state">
+          <p>Results will appear here after you run an analysis.</p>
+        </div>
+
+        <div id="result" class="result hidden" aria-live="polite">
+          <div class="card result-summary">
+            <div class="score-gauge">
+              <svg viewBox="0 0 120 120" class="gauge-svg">
+                <circle cx="60" cy="60" r="52" class="gauge-track" />
+                <circle cx="60" cy="60" r="52" class="gauge-value" id="gauge-circle" />
+              </svg>
+              <div class="gauge-label">
+                <span id="score-number">--</span>
+                <span class="gauge-unit">/ 100</span>
+              </div>
+            </div>
+            <div class="verdict-block">
+              <span id="verdict-badge" class="badge">--</span>
+              <p id="ai-summary" class="ai-summary"></p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <h3>Source Reputation</h3>
+              <p class="metric" id="source-score">--</p>
+              <p class="muted" id="source-domain"></p>
+              <p class="notes" id="source-notes"></p>
+            </div>
+            <div class="card">
+              <h3>Language &amp; Style</h3>
+              <p class="metric" id="style-score">--</p>
+              <ul class="flag-list" id="style-flags"></ul>
+            </div>
+            <div class="card">
+              <h3>AI Fact-Check</h3>
+              <p class="metric" id="ai-score">--</p>
+              <p class="muted" id="ai-search-status"></p>
+              <ul class="flag-list" id="red-flags"></ul>
+            </div>
+          </div>
+
+          <div class="card details-card">
+            <div class="details-scroll">
+              <div class="details-section">
+                <h3>Key Claims Assessed</h3>
+                <ul class="claims-list" id="claims-list"></ul>
+              </div>
+              <div class="details-section">
+                <h3>Cited / Corroborating Sources</h3>
+                <ul class="sources-list" id="sources-list"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="error-box" class="error hidden"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
